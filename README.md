@@ -81,10 +81,19 @@ This tool can be integrated into **Hardhat**, **Ethers**, or any web3 project by
 For example, in Hardhat, you could load the decrypted key using `ethers` like this:
 
 ```javascript
-require("dotenv").config();
 const { ethers } = require("ethers");
+const CryptoJS = require("crypto-js");
+const readline = require('readline');
+require("dotenv").config();
 
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, ethers.provider);
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+let wallet;
+
+rl.question('Enter the pass phrase to unlock the private key: ', (passString) => {
+    const privateKey = CryptoJS.AES.decrypt(process.env.ENCRYPTED_PRIVATE_KEY, passString).toString(CryptoJS.enc.Utf8);
+    wallet = new ethers.Wallet(privateKey);
+    console.log(`Wallet connected: ${wallet.address}`);
+});
 ```
 
 ## Notes
